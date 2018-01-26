@@ -8,85 +8,90 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
+import uk.ac.mmu.georgebarker.stationsapp.activity.MainActivity;
 import uk.ac.mmu.georgebarker.stationsapp.adapter.StationAdapter;
 import uk.ac.mmu.georgebarker.stationsapp.model.Station;
+import uk.ac.mmu.georgebarker.stationsapp.service.MapService;
 
-public class StationsAsyncTask extends AsyncTask<Void, Void, Void> {
+public class StationsAsyncTask extends AsyncTask<Void, Void, String> {
 
-    private static final int HTTP_OK = 200;
+    private static final int FIVE_SECONDS_IN_MILLIS = 5 * 1000;
 
     private String urlString;
     private Location location;
     private StationAdapter stationAdapter;
-    private String jsonString;
+    private MapService mapService;
+    private MainActivity activity;
 
-    public StationsAsyncTask(String urlString, Location location, StationAdapter stationAdapter) {
+    public StationsAsyncTask(String urlString, Location location, StationAdapter stationAdapter, MapService mapService, MainActivity activity) {
         this.urlString = urlString;
         this.location = location;
         this.stationAdapter = stationAdapter;
+        this.mapService = mapService;
+        this.activity = activity;
     }
 
     @Override
-    protected Void doInBackground(Void... voids) {
-        HttpURLConnection connection = null;
+    protected String doInBackground(Void... aVoid) {
+        String jsonString = null;
         try {
             URL url = new URL(urlString);
-            connection = (HttpURLConnection) url.openConnection();
-            int responseCode = connection.getResponseCode();
-
-            if (responseCode == HTTP_OK) {
-                jsonString = new Scanner(url.openStream(), "UTF-8").useDelimiter("\\A").next();
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            if (connection != null) {
-                connection.disconnect();
-            }
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setConnectTimeout(FIVE_SECONDS_IN_MILLIS);
+            connection.connect();
+            InputStream stream = connection.getInputStream();
+            jsonString = new Scanner(stream, "UTF-8").useDelimiter("\\A").next();
+        } catch (Exception e) {
+            //jsonString will be null, and is handled in onPostExecute.
         }
-        return null;
+        return jsonString;
     }
 
     @Override
-    protected void onPostExecute(Void aVoid) {
-        JSONArray jsonStations = null;
+    protected void onPostExecute(String jsonString) {
+        JSONArray jsonStations;
+        List<Station> stations;
         try {
+            if (jsonString == null) throw new Exception();
             jsonStations = new JSONArray(jsonString);
-        } catch (JSONException e) {
-            e.printStackTrace();
-            //jsonString is fucked, set error messages, return.
+            stations = mapJsonToStations(jsonStations);
+        } catch (Exception e) {
+            //Something went wrong, display error messages.
+            activity.showMainLayout(false);
+            activity.showErrorMessages();
+            return;
         }
-        List<Station> stations = mapJsonToStations(jsonStations);
+
+        activity.showMainLayout(true);
         stationAdapter.updateStations(stations);
+        mapService.updateMap(stations, location);
     }
 
-    private List<Station> mapJsonToStations(JSONArray jsonArray) {
+    private List<Station> mapJsonToStations(JSONArray jsonArray) throws Exception {
         List<Station> stations = new ArrayList<>();
         for (int index = 0; index < jsonArray.length(); index++) {
             Station station = new Station();
             JSONObject jsonStation;
-            try {
                 jsonStation = jsonArray.getJSONObject(index);
                 station.setStationName(jsonStation.getString("StationName"));
 
                 double latitude = jsonStation.getDouble("Latitude");
                 double longitude = jsonStation.getDouble("Longitude");
 
+                station.setLatitude(latitude);
+                station.setLongitude(longitude);
+
                 double distance = getDistanceToStationFromCurrentLocation(latitude, longitude);
                 station.setDistanceFromCurrentLocation(distance);
 
                 stations.add(station);
-
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-
         }
 
         return stations;

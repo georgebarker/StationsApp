@@ -8,6 +8,7 @@ import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
 import java.util.List;
+import java.util.Locale;
 
 import uk.ac.mmu.georgebarker.stationsapp.R;
 import uk.ac.mmu.georgebarker.stationsapp.model.Station;
@@ -36,7 +37,8 @@ public class StationAdapter extends ArrayAdapter<Station> {
         TextView distanceFromCurrentLocation = convertView.findViewById(R.id.distance);
 
         stationName.setText(station.getStationName());
-        distanceFromCurrentLocation.setText(String.valueOf(station.getDistanceFromCurrentLocation()));
+        String distance = getDistanceFromLocationString(station.getDistanceFromCurrentLocation());
+        distanceFromCurrentLocation.setText(distance);
 
 
         return convertView;
@@ -46,5 +48,16 @@ public class StationAdapter extends ArrayAdapter<Station> {
         this.stations.clear();
         this.stations.addAll(stations);
         notifyDataSetChanged();
+    }
+
+    private String getDistanceFromLocationString(double distance) {
+        int ONE_KILOMETER = 1000;
+        String KILOMETER_FORMAT = "%.2f km away";
+        String METER_FORMAT = "%.2f m away";
+        if (distance >= ONE_KILOMETER) {
+            return String.format(Locale.UK, KILOMETER_FORMAT,(distance / ONE_KILOMETER));
+        } else {
+            return String.format(Locale.UK, METER_FORMAT, (distance));
+        }
     }
 }
