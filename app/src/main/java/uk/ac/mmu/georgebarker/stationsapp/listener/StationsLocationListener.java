@@ -4,6 +4,10 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.os.Bundle;
 
+/**
+ * I am a class that has been left intentionally blank to make code cleaner in other classes -
+ * I am used to start listening to the devices location.
+ */
 public class StationsLocationListener implements LocationListener {
     @Override
     public void onLocationChanged(Location location) {

@@ -19,12 +19,24 @@ public class UpdateButtonClickedListener implements View.OnClickListener {
     private StationAdapter stationAdapter;
     private MapService mapService;
 
+    /**
+     * I am the constructor used when the application has no permissions
+     * to set up any of the services that it requires.
+     * @param activity
+     */
     public UpdateButtonClickedListener(MainActivity activity) {
         this.activity = activity;
         locationService = null;
         networkService = null;
     }
 
+    /**
+     * I am the constructor used when the application has all permissions necessary.
+     * @param locationService
+     * @param networkService
+     * @param stationAdapter
+     * @param mapService
+     */
     public UpdateButtonClickedListener(LocationService locationService, NetworkService networkService, StationAdapter stationAdapter, MapService mapService) {
         this.locationService = locationService;
         this.networkService = networkService;
@@ -32,6 +44,12 @@ public class UpdateButtonClickedListener implements View.OnClickListener {
         this.mapService = mapService;
     }
 
+    /**
+     * I am used when the update button is clicked - if the services it null,
+     * it means we do not have permissions, so we must request them.
+     * Otherwise, we will get our location and update our app with the new stations.
+     * @param v
+     */
     @Override
     public void onClick(View v) {
         //if services are null, request permissions.

@@ -20,6 +20,9 @@ import uk.ac.mmu.georgebarker.stationsapp.adapter.StationAdapter;
 import uk.ac.mmu.georgebarker.stationsapp.model.Station;
 import uk.ac.mmu.georgebarker.stationsapp.service.MapService;
 
+/**
+ * I am a class that retrieves the five nearest train stations using an AsyncTask.
+ */
 public class StationsAsyncTask extends AsyncTask<Void, Void, String> {
 
     private static final int FIVE_SECONDS_IN_MILLIS = 5 * 1000;
@@ -30,7 +33,16 @@ public class StationsAsyncTask extends AsyncTask<Void, Void, String> {
     private MapService mapService;
     private MainActivity activity;
 
-    public StationsAsyncTask(String urlString, Location location, StationAdapter stationAdapter, MapService mapService, MainActivity activity) {
+    /**
+     * I create the AsyncTask used to retrieve the five nearest stations.
+     * @param urlString The formed URL that will be used to request the 5 nearest stations.
+     * @param location The devices current location.
+     * @param stationAdapter The adapter of the listView that is populated with the stations.
+     * @param mapService The MapService that will populate the map with the stations.
+     * @param activity The parent activity.
+     */
+    public StationsAsyncTask(String urlString, Location location, StationAdapter stationAdapter,
+                             MapService mapService, MainActivity activity) {
         this.urlString = urlString;
         this.location = location;
         this.stationAdapter = stationAdapter;
@@ -38,6 +50,12 @@ public class StationsAsyncTask extends AsyncTask<Void, Void, String> {
         this.activity = activity;
     }
 
+    /**
+     * I am the doInBackground implementation; I go off and get the five nearest stations from the
+     * web service as a string of JSON.
+     * @param aVoid
+     * @return
+     */
     @Override
     protected String doInBackground(Void... aVoid) {
         String jsonString = null;
@@ -54,6 +72,11 @@ public class StationsAsyncTask extends AsyncTask<Void, Void, String> {
         return jsonString;
     }
 
+    /**
+     * I am the onPostExecute implementation; I recieve the jsonString that we got from the server,
+     * validate that it is correct, turn it into some Station objects, and update the UI with them.
+     * @param jsonString The string of JSON that came from the server
+     */
     @Override
     protected void onPostExecute(String jsonString) {
         JSONArray jsonStations;
@@ -74,6 +97,11 @@ public class StationsAsyncTask extends AsyncTask<Void, Void, String> {
         mapService.updateMap(stations, location);
     }
 
+    /**
+     * @param jsonArray The JSON from the server as a generic JSON Array
+     * @return Some nice Station objects that were converted from the generic JSONArray
+     * @throws Exception thrown if something went wrong converting from JSONArray > Station.
+     */
     private List<Station> mapJsonToStations(JSONArray jsonArray) throws Exception {
         List<Station> stations = new ArrayList<>();
         for (int index = 0; index < jsonArray.length(); index++) {
@@ -97,6 +125,12 @@ public class StationsAsyncTask extends AsyncTask<Void, Void, String> {
         return stations;
     }
 
+    /**
+     * I use the devices current location to calculate the distance between a provided latitude and longitude.
+     * @param latitude provided latitude of a station
+     * @param longitude provided longitude of a station
+     * @return
+     */
     private double getDistanceToStationFromCurrentLocation(double latitude, double longitude) {
         float[] floats = new float[1];
         Location.distanceBetween(location.getLatitude(), location.getLongitude(), latitude, longitude, floats);

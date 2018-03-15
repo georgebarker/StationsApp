@@ -1,5 +1,8 @@
 package uk.ac.mmu.georgebarker.stationsapp.model;
 
+/**
+ * I am a POJO that represents a train station.
+ */
 public class Station {
     private String stationName;
     private double distanceFromCurrentLocation;

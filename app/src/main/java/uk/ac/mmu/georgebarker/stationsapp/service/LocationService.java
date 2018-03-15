@@ -15,6 +15,9 @@ import uk.ac.mmu.georgebarker.stationsapp.listener.StationsLocationListener;
 
 import static android.content.Context.LOCATION_SERVICE;
 
+/**
+ * I am a class that provides services to retrieve the devices current location.
+ */
 public class LocationService {
 
     private static final int CHECK_FOR_UPDATE_DISTANCE = 10; // (m)
@@ -23,16 +26,26 @@ public class LocationService {
     private Context context;
     private LocationManager locationManager;
 
+    /**
+     * I create the location service and set up the location manager for use.
+     * The Missing Permission warning has been suppressed,
+     * as this is safety checked further up the stack.
+     * @param context
+     */
     @SuppressLint("MissingPermission")
     public LocationService(Context context) {
         this.context = context;
         locationManager = (LocationManager) context.getSystemService(LOCATION_SERVICE);
-        //this could go in constructor - not sure.
-        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, CHECK_FOR_UPDATE_DISTANCE,
-                CHECK_FOR_UPDATE_TIME, new StationsLocationListener());
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
+                CHECK_FOR_UPDATE_TIME, CHECK_FOR_UPDATE_DISTANCE, new StationsLocationListener());
     }
 
 
+    /**
+     * The Missing Permission warning has been suppressed,
+     * as this is safety checked in here but is not detected.
+     * @return the devices location
+     */
     @SuppressLint("MissingPermission")
     public Location getLocation() {
         if (locationManager != null) {
@@ -54,11 +67,19 @@ public class LocationService {
         return null;
     }
 
+    /**
+     * @return I return whether the location permissions have been granted.
+     */
     private boolean arePermissionsGranted() {
         return context.checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
                 && context.checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED;
     }
 
+
+    /**
+     * I request the location permissions.
+     * @param activity
+     */
     public static void requestLocationPermissions(Activity activity) {
         ActivityCompat.requestPermissions(activity, new String[] {
                         Manifest.permission.ACCESS_FINE_LOCATION,

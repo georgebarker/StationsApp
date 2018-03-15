@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:padding="8dp"
+    android:padding="6dp"
     android:layout_margin="2dp">
 
     <TextView
@@ -13,7 +13,7 @@
     android:layout_alignParentTop="true"
         tools:text="London Euston"
         android:textColor="@android:color/black"
-        android:textSize="18sp"/>
+        android:textSize="16sp"/>
 
     <TextView
         android:id="@+id/distance"
@@ -22,6 +22,6 @@
         tools:text="358m away"
         android:textColor="@android:color/black"
         android:layout_below="@id/station_name"
-        android:textSize="14sp"/>
+        android:textSize="12sp"/>
 
 </RelativeLayout>

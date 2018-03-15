@@ -24,20 +24,27 @@ import uk.ac.mmu.georgebarker.stationsapp.service.LocationService;
 import uk.ac.mmu.georgebarker.stationsapp.service.NetworkService;
 import uk.ac.mmu.georgebarker.stationsapp.service.MapService;
 
+/**
+ * I am the main activity, I am the only activity in this app.
+ * I show the list of 5 nearest train stations and a map of them.
+ */
 public class MainActivity extends AppCompatActivity {
 
     private ListView stationsListView;
     private FloatingActionButton updateButton;
     private SupportMapFragment map;
     private Context context;
-    private NetworkService networkService;
-    private LocationService locationService;
     private RelativeLayout errorLayout;
     private LinearLayout mainLayout;
     private RelativeLayout loadingLayout;
     private List<Station> stations = new ArrayList<>();
 
 
+    /**
+     * I set up views and request the permissions to access the devices location.
+     *
+     * @param savedInstanceState
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -53,18 +60,27 @@ public class MainActivity extends AppCompatActivity {
         updateButton = findViewById(R.id.update_fab);
         map = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
 
-//        showMainLayout(false); need to find where this should go so the map can be set up nicely.
-
         LocationService.requestLocationPermissions(this);
     }
 
+    /**
+     * I am called when the user allows or denies the location permissions.
+     * If the permissions are granted, I set up my networking and location services and
+     * request and display the data.
+     *
+     * If not, I show error messages.
+     *
+     * @param requestCode
+     * @param permissions
+     * @param grantResults
+     */
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
         if (isPermissionGranted(grantResults)) {
-            locationService = new LocationService(context);
-            networkService = new NetworkService(this);
+            LocationService locationService = new LocationService(context);
+            NetworkService networkService = new NetworkService(this);
 
             StationAdapter adapter = new StationAdapter(stations, context);
             stationsListView.setAdapter(adapter);
@@ -86,11 +102,22 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    /**
+     * I am used to check if the location permissions have been granted.
+     *
+     * @param grantResults will contain two items (coarse and fine location grant result)
+     *                    to check if the permissions were granted
+     * @return
+     */
     private boolean isPermissionGranted(int[] grantResults) {
         return grantResults[0] == PackageManager.PERMISSION_GRANTED
                 && grantResults[1] == PackageManager.PERMISSION_GRANTED;
     }
 
+    /**
+     * Hides or shows the main layout.
+     * @param isVisible used to hide or show the main layout
+     */
     public void showMainLayout(boolean isVisible) {
         if (isVisible) {
             mainLayout.setVisibility(LinearLayout.VISIBLE);
@@ -101,6 +128,9 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Shows the error messages.
+     */
     public void showErrorMessages() {
         mainLayout.setVisibility(LinearLayout.GONE);
         loadingLayout.setVisibility(RelativeLayout.GONE);

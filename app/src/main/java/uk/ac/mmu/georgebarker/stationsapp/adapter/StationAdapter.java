@@ -13,10 +13,19 @@ import java.util.Locale;
 import uk.ac.mmu.georgebarker.stationsapp.R;
 import uk.ac.mmu.georgebarker.stationsapp.model.Station;
 
+/**
+ * I am an adapter class that allows a custom view to be used for the Station model
+ * when displaying it in a listView.
+ */
 public class StationAdapter extends ArrayAdapter<Station> {
     private Context context;
     private List<Station> stations;
 
+    /**
+     * I create a StationAdapter using the custom station_item layout.
+     * @param stations first set of stations
+     * @param context application context
+     */
     public StationAdapter(List<Station> stations, Context context) {
         super(context, R.layout.station_item, stations);
         this.stations = stations;
@@ -24,6 +33,13 @@ public class StationAdapter extends ArrayAdapter<Station> {
 
     }
 
+    /**
+     * I am the implementation of getView, that populates individual rows in the list view.
+     * @param position
+     * @param convertView
+     * @param parent
+     * @return
+     */
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         if (convertView == null) {
@@ -44,12 +60,21 @@ public class StationAdapter extends ArrayAdapter<Station> {
         return convertView;
     }
 
+    /**
+     * I am used to update the stations that are visible in the list
+     * @param stations list of stations to update with
+     */
     public void updateStations(List<Station> stations) {
         this.stations.clear();
         this.stations.addAll(stations);
         notifyDataSetChanged();
     }
 
+    /**
+     * I format the distance away from a location into a readable string, picking metres or kilometres as appropriate.
+     * @param distance
+     * @return
+     */
     private String getDistanceFromLocationString(double distance) {
         int ONE_KILOMETER = 1000;
         String KILOMETER_FORMAT = "%.2f km away";
